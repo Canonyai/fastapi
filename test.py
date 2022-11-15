@@ -2,7 +2,7 @@ from data_extraction import Scope
 from github import Github
 import pytest
 from typing import Type
-from utils import Content
+from utils import Content, Language
 import os
 
 ########## SETUP ##########
@@ -95,13 +95,40 @@ def test_prs(organization: Type[Scope], user2: Type[Scope]):
     )
 
 
+def test_file_contents(organization: Type[Scope], user1: Type[Scope]):
+    assert compare_list_to_set(
+        organization.get_files_by_language("fastapi", Language.PY),
+        {"data_extraction.py", "test.py"},
+        flag=Content.FILE,
+    )
+    assert compare_list_to_set(
+        organization.get_files_by_language("sweng-metrics-front-end", Language.JS),
+        {"src/containers/Topbar/InsideHeader/index.js", "config-overrides.js"},
+        flag=Content.FILE,
+    )
+
+    assert compare_list_to_set(
+        user1.get_files_by_language("simple-git", Language.PY),
+        {"tests/test_ezgit.py"},
+        flag=Content.FILE,
+    )
+    assert compare_list_to_set(
+        user1.get_files_by_language("drumwebsite", Language.JS),
+        {"index.js"},
+        flag=Content.FILE,
+    )
+
+
 ########## HELPER FUNCTIONS ##########
 def compare_list_to_set(api_result, expected_values, flag) -> bool:
     assert isinstance(flag, Content), TypeError("flag expects a Content Enum.")
     a_values = {
         val
         for val in map(
-            lambda x: x.name if flag == Content.REPO else x.title, api_result
+            lambda x: x.name
+            if flag == Content.REPO
+            else (x.path if flag == Content.FILE else x.title),
+            api_result,
         )
     }
     lesser, greater = minmax(a_values, expected_values)
