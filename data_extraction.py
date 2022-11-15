@@ -43,23 +43,23 @@ class Scope:
         """
         Returns a list of all the closed issues from the specified repository.
         """
-        if repo in self.issues:
-            return self.issues[repo]
-        else:
+        if not repo in self.issues:
             repository = self.scope.get_repo(repo)
             issues = list(repository.get_issues(state="closed"))
             self.issues[repo] = issues
+
+        return self.issues[repo]
 
     def get_prs_from_repo(self, repo: str) -> list:
         """
         Returns a list of all closed pull requests from the specified repository.
         """
-        if repo in self.prs:
-            return self.prs[repo]
-        else:
+        if not repo in self.prs:
             repository = self.scope.get_repo(repo)
             prs = list(repository.get_pulls(state="closed"))
             self.prs[repo] = prs
+
+        return self.prs[repo]
 
     def get_pull_requests(self) -> list:
         """
@@ -77,7 +77,10 @@ class Scope:
     def get_prs_by_time(self, repo: str, before, after):
         pass
 
-    def get_files_by_language(self, repo: str, language) -> Dict[str, list]:
+    def get_files_by_language(self, repo: str, language) -> list:
+        """
+        Returns a list of files in a repo that match the specified language
+        """
         if language == Language.PY:
             if repo in self.python_files:
                 return self.python_files[repo]
