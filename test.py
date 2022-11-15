@@ -55,7 +55,8 @@ def test_repos(organization: Type[Scope], user1: Type[Scope]):
 
 def test_issues(organization: Type[Scope], user2: Type[Scope]):
     assert partial_compare(
-        organization.get_issues(), {"sweng-metrics-front-end": [], "fastapi": []}
+        organization.get_issues(),
+        {"fastapi": ["Add test file and data extraction ", "Add .gitignore"]},
     )
     assert partial_compare(
         user2.get_issues(),
@@ -73,7 +74,8 @@ def test_issues(organization: Type[Scope], user2: Type[Scope]):
 
 def test_prs(organization: Type[Scope], user2: Type[Scope]):
     assert partial_compare(
-        organization.get_pull_requests(), {"sweng-metrics-front-end": [], "fastapi": []}
+        organization.get_pull_requests(),
+        {"fastapi": ["Add test file and data extraction ", "Add .gitignore"]},
     )
     assert partial_compare(
         user2.get_pull_requests(),
@@ -90,17 +92,8 @@ def test_prs(organization: Type[Scope], user2: Type[Scope]):
 
 
 ########## HELPER FUNCTIONS ##########
-def compare_list_to_set(a, b, flag) -> bool:
+def compare_list_to_set(api_result, expected_values, flag) -> bool:
     assert isinstance(flag, Content), TypeError("flag expects a Content Enum.")
-    a_values = {
-        val for val in map(lambda x: x.name if flag == Content.REPO else x.title, a)
-    }
-    return a_values == b
-
-
-def compare_list_to_set_issues(api_result, expected_values, flag) -> bool:
-    assert isinstance(flag, Content), TypeError("flag expects a Content Enum.")
-    assert flag == Content.ISSUE, ValueError("flag should be the Content.ISSUE Enum.")
     a_values = {
         val
         for val in map(
@@ -116,7 +109,7 @@ def compare_list_to_set_issues(api_result, expected_values, flag) -> bool:
 
 def partial_compare(api_result, expected) -> bool:
     """
-    The repos with issues usually have a lot of repos and issues so for testing we just check a subset of issues in a subset of repos
+    The repos with issues usually have a lot of repos, issues and prs, so for testing we just check a subset of issues in a subset of repos
     Alternatively, we could create a mock github account that is concise enough for testing the functions exactly.
     """
     lesser, greater = minmax(api_result, expected)
@@ -125,12 +118,12 @@ def partial_compare(api_result, expected) -> bool:
         if key not in greater:
             return False
         if expected == lesser:
-            if not compare_list_to_set_issues(
+            if not compare_list_to_set(
                 greater[key], set(lesser[key]), flag=Content.ISSUE
             ):
                 return False
         else:
-            if not compare_list_to_set_issues(
+            if not compare_list_to_set(
                 lesser[key], set(greater[key]), flag=Content.ISSUE
             ):
                 return False
