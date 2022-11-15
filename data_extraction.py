@@ -43,7 +43,7 @@ class Scope:
         """
         Returns a list of all the closed issues from the specified repository.
         """
-        if not repo in self.issues:
+        if repo not in self.issues:
             repository = self.scope.get_repo(repo)
             issues = list(repository.get_issues(state="closed"))
             self.issues[repo] = issues
@@ -54,7 +54,7 @@ class Scope:
         """
         Returns a list of all closed pull requests from the specified repository.
         """
-        if not repo in self.prs:
+        if repo not in self.prs:
             repository = self.scope.get_repo(repo)
             prs = list(repository.get_pulls(state="closed"))
             self.prs[repo] = prs
