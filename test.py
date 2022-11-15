@@ -57,6 +57,7 @@ def test_issues(organization: Type[Scope], user2: Type[Scope]):
     assert partial_compare(
         organization.get_issues(),
         {"fastapi": ["Add test file and data extraction ", "Add .gitignore"]},
+        Content.ISSUE,
     )
     assert partial_compare(
         user2.get_issues(),
@@ -66,6 +67,7 @@ def test_issues(organization: Type[Scope], user2: Type[Scope]):
                 "Attempt to debug missing native binaries",
             ]
         },
+        Content.ISSUE,
     )
     assert compare_list_to_set(
         user2.get_issues_from_repo("ocaml-futures"), {"Fix copy"}, flag=Content.ISSUE
@@ -76,6 +78,7 @@ def test_prs(organization: Type[Scope], user2: Type[Scope]):
     assert partial_compare(
         organization.get_pull_requests(),
         {"fastapi": ["Add test file and data extraction ", "Add .gitignore"]},
+        Content.PR,
     )
     assert partial_compare(
         user2.get_pull_requests(),
@@ -85,6 +88,7 @@ def test_prs(organization: Type[Scope], user2: Type[Scope]):
                 "Add .idea and .ruff_cache to .vscodeignore",
             ]
         },
+        Content.PR,
     )
     assert compare_list_to_set(
         user2.get_prs_from_repo("ocaml-futures"), {"Fix copy"}, flag=Content.PR
@@ -107,7 +111,7 @@ def compare_list_to_set(api_result, expected_values, flag) -> bool:
     return True
 
 
-def partial_compare(api_result, expected) -> bool:
+def partial_compare(api_result, expected, flag) -> bool:
     """
     The repos with issues usually have a lot of repos, issues and prs, so for testing we just check a subset of issues in a subset of repos
     Alternatively, we could create a mock github account that is concise enough for testing the functions exactly.
@@ -118,14 +122,10 @@ def partial_compare(api_result, expected) -> bool:
         if key not in greater:
             return False
         if expected == lesser:
-            if not compare_list_to_set(
-                greater[key], set(lesser[key]), flag=Content.ISSUE
-            ):
+            if not compare_list_to_set(greater[key], set(lesser[key]), flag):
                 return False
         else:
-            if not compare_list_to_set(
-                lesser[key], set(greater[key]), flag=Content.ISSUE
-            ):
+            if not compare_list_to_set(lesser[key], set(greater[key]), flag):
                 return False
     return True
 
