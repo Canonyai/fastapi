@@ -8,4 +8,4 @@
 4. Before adding/committing any files;
     - Run `pytest test.py` and make sure tests pass.
     - Run `black .` to format your code bef.
-5. After making a pull request, don't attempt to merge unless the check passes.
+5. After making a pull request, don't attempt to merge unless the check passes, it might take a few seconds for it to show up.
