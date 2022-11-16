@@ -75,14 +75,14 @@ class Scope:
     def get_issues_by_time(
         self, repo: str, before: Type[datetime], after: Type[datetime]
     ) -> list:
-        issues = self.get_issues_from_repo(issues)
-        return list(filter(self.get_values_in_range, issues))
+        issues = self.get_issues_from_repo(repo)
+        return [val for val in issues if self.get_values_in_range(val, before, after)]
 
     def get_prs_by_time(
         self, repo: str, before: Type[datetime], after: Type[datetime]
     ) -> list:
         prs = self.get_prs_from_repo(repo)
-        return list(filter(self.get_values_in_range, prs))
+        return [val for val in prs if self.get_values_in_range(val, before, after)]
 
     def get_files_by_language(self, repo: str, language) -> list:
         """
