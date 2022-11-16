@@ -146,3 +146,10 @@ class Scope:
 
     def get_values_in_range(self, object, before, after):
         return object.created_at >= before and object.closed_at <= after
+
+    def get_time_taken(self, object) -> datetime:
+        """
+        Takes in a closed issue or pr and returns how long oit takes to close the repo 
+        """
+        return object.closed_at - object.created_at 
+    
