@@ -9,6 +9,7 @@ class Scope:
     """
     This can be either a user, organisation or team?
     Currently there is no authorisation so only public repos and information are available
+    All prs and issues returned are closed as we don't care about open prs for our metrics.
     """
 
     JS_EXTENSIONS = (".js", ".jsx", ".ts", ".tsx")
