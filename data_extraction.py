@@ -115,10 +115,16 @@ class Scope:
                 "A Language Enum should be passed in for the language parameter."
             )
 
-    def get_python_files(self, repo):
+    def get_python_files(self, repo) -> list:
+        """
+        Returns a list of python files in the repo
+        """
         return self.get_files_by_language(repo, Language.PY)
 
-    def get_javascript_files(self, repo):
+    def get_javascript_files(self, repo) -> list:
+        """
+        Reeturns a list of javascript files in the repo
+        """
         return self.get_files_by_language(repo, Language.JS)
 
     def get_commits(self, repo):
