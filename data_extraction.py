@@ -1,5 +1,6 @@
-from typing import Dict
+from typing import Dict, Type
 from collections import deque
+from datetime import datetime
 
 from utils import Language
 
@@ -71,11 +72,17 @@ class Scope:
 
         return self.prs
 
-    def get_issues_by_time(self, repo: str, before, after):
-        pass
+    def get_issues_by_time(
+        self, repo: str, before: Type[datetime], after: Type[datetime]
+    ) -> list:
+        issues = self.get_issues_from_repo(repo)
+        return [val for val in issues if self.get_values_in_range(val, before, after)]
 
-    def get_prs_by_time(self, repo: str, before, after):
-        pass
+    def get_prs_by_time(
+        self, repo: str, before: Type[datetime], after: Type[datetime]
+    ) -> list:
+        prs = self.get_prs_from_repo(repo)
+        return [val for val in prs if self.get_values_in_range(val, before, after)]
 
     def get_files_by_language(self, repo: str, language) -> list:
         """
@@ -123,3 +130,6 @@ class Scope:
                 if file_content.path.endswith(file_extensions):
                     cache[repo].append(file_content)
         return cache
+
+    def get_values_in_range(self, object, before, after):
+        return object.created_at >= before and object.closed_at <= after

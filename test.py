@@ -4,6 +4,8 @@ import pytest
 from typing import Type
 from utils import Content, Language
 import os
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 ########## SETUP ##########
 @pytest.fixture
@@ -24,6 +26,16 @@ def user1(github) -> Type[Scope]:
 @pytest.fixture
 def user2(github) -> Type[Scope]:
     return Scope(github.get_user("charliermarsh"))
+
+
+@pytest.fixture
+def today() -> Type[datetime]:
+    return datetime.today()
+
+
+@pytest.fixture
+def two_months_ago(today) -> Type[datetime]:
+    return today - relativedelta(months=2)
 
 
 ########## TESTS ##########
@@ -53,7 +65,12 @@ def test_repos(organization: Type[Scope], user1: Type[Scope]):
     )
 
 
-def test_issues(organization: Type[Scope], user2: Type[Scope]):
+def test_issues(
+    organization: Type[Scope],
+    user2: Type[Scope],
+    today: Type[datetime],
+    two_months_ago: Type[datetime],
+):
     assert partial_compare(
         organization.get_issues(),
         {"fastapi": ["Add test file and data extraction ", "Add .gitignore"]},
@@ -72,9 +89,21 @@ def test_issues(organization: Type[Scope], user2: Type[Scope]):
     assert compare_list_to_set(
         user2.get_issues_from_repo("ocaml-futures"), {"Fix copy"}, flag=Content.ISSUE
     )
+    assert compare_list_to_set(
+        user2.get_issues_by_time(
+            repo="vscode-ruff", before=two_months_ago, after=today
+        ),
+        {"Error when trying to use ruff from selected virtual environment"},
+        flag=Content.ISSUE,
+    )
 
 
-def test_prs(organization: Type[Scope], user2: Type[Scope]):
+def test_prs(
+    organization: Type[Scope],
+    user2: Type[Scope],
+    today: Type[datetime],
+    two_months_ago: Type[datetime],
+):
     assert partial_compare(
         organization.get_pull_requests(),
         {"fastapi": ["Add test file and data extraction ", "Add .gitignore"]},
@@ -92,6 +121,11 @@ def test_prs(organization: Type[Scope], user2: Type[Scope]):
     )
     assert compare_list_to_set(
         user2.get_prs_from_repo("ocaml-futures"), {"Fix copy"}, flag=Content.PR
+    )
+    assert compare_list_to_set(
+        user2.get_prs_by_time(repo="vscode-ruff", before=two_months_ago, after=today),
+        {"Fix incorrect repository URL"},
+        flag=Content.PR,
     )
 
 
