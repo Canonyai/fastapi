@@ -4,10 +4,13 @@ import pytest
 from typing import Type
 from utils import Content, Language
 import os
+from dotenv import load_dotenv
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 ########## SETUP ##########
+load_dotenv()
+
 @pytest.fixture
 def github() -> Type[Github]:
     return Github(os.environ.get("GH_API_TOKEN"))
