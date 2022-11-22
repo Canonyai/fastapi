@@ -11,6 +11,7 @@ from dateutil.relativedelta import relativedelta
 ########## SETUP ##########
 load_dotenv()
 
+
 @pytest.fixture
 def github() -> Type[Github]:
     return Github(os.environ.get("GH_API_TOKEN"))
