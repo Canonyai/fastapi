@@ -149,7 +149,7 @@ class Scope:
 
     def get_time_taken(self, object) -> datetime:
         """
-        Takes in a closed issue or pr and returns how long oit takes to close the repo 
+        Takes in a closed issue or pr and returns how long it takes to close the repo 
         """
         return object.closed_at - object.created_at 
     
