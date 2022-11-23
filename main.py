@@ -9,12 +9,16 @@ from pywebio import config
 from pywebio.output import *
 from github import Github
 from data_extraction import Scope
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
  # TODO METRIC TEAM:  import your file
 
 
-def task1(n1, n2):
-    github = Github(n2)
+def task1(n1):
+    github = Github(os.environ.get("GH_API_TOKEN"))
     usr1 = Scope(github.get_user(n1))
     set1 = usr1.get_repositories()
     tableSrc = []
@@ -27,19 +31,17 @@ def task1(n1, n2):
     rows = tableSrc
     table.add(headers, rows)
     table.set_global_opts(
-        title_opts=ComponentTitleOpts(title="Table-基本示例", subtitle="我是副标题支持换行哦")
+        title_opts=ComponentTitleOpts(title="Repos", subtitle="details")
     )
     put_html(table.render_notebook())
 
 
 @config(theme='dark')
 def main():
-    info = input_group("login git", [
-        input('User name:', name='usr'),
-        input('Token:', name='pass')
+    info = input_group("Enter username", [
+        input('Username:', name='usr')
     ])
     name1 = info['usr']
-    name2 = info['pass']
 
     put_grid([
         [span(put_markdown('## Section A'), col=2)],
@@ -47,8 +49,7 @@ def main():
         [put_scope('1-1'), put_scope('1-2')]
     ], cell_widths='60% 60%')
     with use_scope('1-1'):
-        task1(name1, name2)
-
+        task1(name1)
 
 
 app = Flask(__name__)
