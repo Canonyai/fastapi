@@ -2,8 +2,11 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from data_extraction import Scope
 from github import Github
+from dotenv import load_dotenv
+import os
 
-github = Github("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")
+load_dotenv()
+github = Github(os.environ.get("GH_API_TOKEN"))
 usr = Scope(github.get_user("charliermarsh"))
 
 
