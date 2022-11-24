@@ -7,22 +7,26 @@ from pyecharts.components import Table
 from pyecharts.options import ComponentTitleOpts
 from pywebio import config
 from pywebio.output import *
+from pywebio.pin import *
+from pywebio.output import put_html
+from pyecharts import options as opts
+from pyecharts.charts import Bar
 from github import Github
 from data_extraction import Scope
 from dotenv import load_dotenv
 import os
 from data_processing import get_repos
+from data_processing import get_code_review_time
 
 load_dotenv()
+github = Github(os.environ.get("GH_API_TOKEN"))
 
-
-def task1(n1):
-    github = Github(os.environ.get("GH_API_TOKEN"))
-    usr1 = Scope(github.get_user(n1))
-    set1 = get_repos(usr1)
+def task1():
+    global usr
+    repo_list = get_repos(usr)
     tableSrc = []
     number = 1
-    for each in set1:
+    for each in repo_list:
         tableSrc.append([number, each])
         number += 1
     table = Table()
@@ -34,30 +38,55 @@ def task1(n1):
     )
     put_html(table.render_notebook())
 
+def page2():
+    global name
+    with use_scope("scope1", clear=True):
+        put_markdown('## Repos of '+name)
+        task1()
+        task2()
+
 
 def task2():
-    info = input_group("Enter repo's name", [
-        input('repo:', name='repo')
-    ])
-    repo_name = info['repo']
+    info = input_group("repo", [input('enter repo name:', name='name')])
+    repo_name = info['name']
+    draw(repo_name)
 
 
+def draw(repo):
+    with use_scope("scope1", clear=True):
+        put_button("back", onclick=page2)
+        task3(repo)
+    
 
-@config(theme='dark')
+def task3(repo):
+    global usr
+    x_axis, y_axis = get_code_review_time(usr, repo)
+    c = (
+        Bar()
+        .add_xaxis(
+            x_axis
+        )
+        .add_yaxis(repo, y_axis)
+        .set_global_opts(
+            xaxis_opts=opts.AxisOpts(axislabel_opts=opts.LabelOpts(rotate=-15)),
+            title_opts=opts.TitleOpts(title="Code review", subtitle="x_axis: pull request name, y_axis: closing time in mins"),
+            datazoom_opts=[opts.DataZoomOpts(), opts.DataZoomOpts(type_="inside")]
+        )
+    
+    )
+    c.width = "100%"
+    put_html(c.render_notebook())
+    
+    
+    
+
 def main():
-    info = input_group("Enter username", [
-        input('Username:', name='usr')
-    ])
-    name1 = info['usr']
-
-    put_grid([
-        [span(put_markdown('## Repos of '+name1), col=2)],
-        [put_markdown('### Repos table ')]
-    ], cell_widths='60% 60%')
-
-    task1(name1)
-
-    task2()
+    global name
+    global usr
+    name = input("Username")
+    usr = Scope(github.get_user(name))
+    page2()
+        
 
 
 
@@ -68,4 +97,4 @@ app.add_url_rule('/tool', 'webio_view', webio_view(main),
                  methods=['GET', 'POST', 'OPTIONS'])  # need GET,POST and OPTIONS methods
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5002)
