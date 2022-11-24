@@ -40,10 +40,6 @@ def get_pr_turnaround_time(user: Scope, start_date: str, end_date: str, repo: st
     pass
 
 
-def parse_date():
-    pass
-
-
 # get percentage of python in files
 # N/B could be implemented to aid func in line 21 (your choice)
 def calculate_percent_typed_py(files: str):
