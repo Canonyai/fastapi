@@ -95,6 +95,8 @@ app = Flask(__name__)
 # `task_func` is PyWebIO task function
 app.add_url_rule('/tool', 'webio_view', webio_view(main),
                  methods=['GET', 'POST', 'OPTIONS'])  # need GET,POST and OPTIONS methods
+                 
+ # TODO METRIC TEAM:  Add a new URL for YOUR specific metric 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5002)
