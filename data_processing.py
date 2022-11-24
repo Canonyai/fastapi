@@ -68,6 +68,6 @@ def get_code_coverage(user: Scope, repo: str, file: str):
 
 
 if __name__ == '__main__':
-    github = Github("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")
+    github = Github("YOUR TOKEN")
     usr = Scope(github.get_user("charliermarsh"))
     print(get_code_review_time(usr, "ruff"))
