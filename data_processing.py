@@ -5,10 +5,6 @@ from github import Github
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
-github = Github(os.environ.get("GH_API_TOKEN"))
-usr = Scope(github.get_user("charliermarsh"))
-
 
 # time taken for code review time metric
 # example of what is required is provided
@@ -73,4 +69,7 @@ def get_code_coverage(user: Scope, repo: str, file: str):
 
 
 if __name__ == '__main__':
+    load_dotenv()
+    github = Github(os.environ.get("GH_API_TOKEN"))
+    usr = Scope(github.get_user("charliermarsh"))
     print(get_code_review_time(usr, "ruff"))
