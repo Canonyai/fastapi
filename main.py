@@ -1,5 +1,4 @@
-from pywebio.platform.flask import webio_view
-from flask import Flask
+import pywebio
 from pywebio.input import *
 from pyecharts import options as opts
 from pyecharts.charts import Radar
@@ -87,16 +86,6 @@ def main():
     usr = Scope(github.get_user(name))
     page2()
         
+    
 
-
-
-app = Flask(__name__)
-
-# `task_func` is PyWebIO task function
-app.add_url_rule('/tool', 'webio_view', webio_view(main),
-                 methods=['GET', 'POST', 'OPTIONS'])  # need GET,POST and OPTIONS methods
-                 
- # TODO METRIC TEAM:  Add a new URL for YOUR specific metric 
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5002)
+pywebio.start_server(main, port=5000, remote_access=True)
