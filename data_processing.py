@@ -2,24 +2,29 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from data_extraction import Scope
 from github import Github
+from dotenv import load_dotenv
+import os
 
 
 # time taken for code review time metric
+# example of what is required is provided
 def get_code_review_time(user: Scope, repo: str):
     x_axis = []
     y_axis = []
     after = datetime.today()  # parse_date(start_date)
     before = after - relativedelta(months=2)  # parse_date(end_date)
     prs = user.get_prs_by_time(repo, before, after)
-    #time_taken = [(pr.title, user.get_time_taken(pr).miniutes) for pr in prs]
-    
+    # time_taken = [(pr.title, user.get_time_taken(pr).minutes) for pr in prs]
+
     for pr in prs:
         x_axis.append(pr.title)
-        y_axis.append(round(user.get_time_taken(pr).seconds/60, 3))
+        y_axis.append(round(user.get_time_taken(pr).seconds / 60, 3))
 
-    #print(*time_taken, sep="\n")
+    # print(*time_taken, sep="\n")
     return x_axis, y_axis
 
+
+# get repositories
 def get_repos(user: Scope):
     repos = user.get_repositories()
     repositories = [repo.name for repo in repos]
@@ -33,10 +38,6 @@ def get_typed_percentage(user: Scope, repo: str):
 
 # get pull request turnaround time
 def get_pr_turnaround_time(user: Scope, start_date: str, end_date: str, repo: str):
-    pass
-
-
-def parse_date():
     pass
 
 
@@ -68,6 +69,7 @@ def get_code_coverage(user: Scope, repo: str, file: str):
 
 
 if __name__ == '__main__':
-    github = Github("YOUR TOKEN")
+    load_dotenv()
+    github = Github(os.environ.get("GH_API_TOKEN"))
     usr = Scope(github.get_user("charliermarsh"))
     print(get_code_review_time(usr, "ruff"))
