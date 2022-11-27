@@ -38,7 +38,7 @@ def get_typed_percentage(user: Scope, repo: str):
     files_untyped = user.get_untyped_files(repo)
     # calculate percentage
     percentage = (len(files_typed) / (len(files_typed) + len(files_untyped))) * 100
-    return round(percentage,2)
+    return round(percentage, 2)
 
 
 # get pull request turnaround time
@@ -73,7 +73,7 @@ def get_code_coverage(user: Scope, repo: str, file: str):
     pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     load_dotenv()
     github = Github(os.environ.get("GH_API_TOKEN"))
     usr = Scope(github.get_user("charliermarsh"))

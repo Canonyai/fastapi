@@ -14,9 +14,29 @@ class Scope:
 
     JS_EXTENSIONS = (".js", ".jsx", ".ts", ".tsx")
     PY_EXTENSIONS = (".py",)
-    TYPED_EXTENSIONS = (".java",".ts",".tsx",".c",".cs",".cpp",".c++",".cc",".cp", ".cxx",".h",".h++",".hh",".hpp",".hxx",".inc",".inl",".ipp",".tcc",".tpp")
-    UNTYPED_EXTENSIONS = (".js", ".jsx",".py",".rb",".ruby",".perl")
-
+    TYPED_EXTENSIONS = (
+        ".java",
+        ".ts",
+        ".tsx",
+        ".c",
+        ".cs",
+        ".cpp",
+        ".c++",
+        ".cc",
+        ".cp",
+        ".cxx",
+        ".h",
+        ".h++",
+        ".hh",
+        ".hpp",
+        ".hxx",
+        ".inc",
+        ".inl",
+        ".ipp",
+        ".tcc",
+        ".tpp",
+    )
+    UNTYPED_EXTENSIONS = (".js", ".jsx", ".py", ".rb", ".ruby", ".perl")
 
     def __init__(self, scope):
         self.scope = scope
@@ -123,7 +143,7 @@ class Scope:
                 self.typed_files = self.populate_cache_with_file_content(
                     repo, self.TYPED_EXTENSIONS, self.typed_files
                 )
-                return self.typed_files[repo]  
+                return self.typed_files[repo]
         elif language == Language.UNTYPED:
             if repo in self.untyped_files:
                 return self.untyped_files[repo]
@@ -131,7 +151,7 @@ class Scope:
                 self.untyped_files = self.populate_cache_with_file_content(
                     repo, self.UNTYPED_EXTENSIONS, self.untyped_files
                 )
-                return self.untyped_files[repo]                 
+                return self.untyped_files[repo]
         else:
             raise TypeError(
                 "A Language Enum should be passed in for the language parameter."
@@ -153,13 +173,13 @@ class Scope:
         """
         Reeturns a list of typed files in the repo
         """
-        return self.get_files_by_language(repo, Language.TYPED)    
+        return self.get_files_by_language(repo, Language.TYPED)
 
     def get_untyped_files(self, repo) -> list:
         """
         Reeturns a list of untyped files in the repo
         """
-        return self.get_files_by_language(repo, Language.UNTYPED)      
+        return self.get_files_by_language(repo, Language.UNTYPED)
 
     def get_commits(self, repo):
         pass
