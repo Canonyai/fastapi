@@ -10,12 +10,12 @@ from pywebio.pin import *
 from pywebio.output import put_html
 from pyecharts import options as opts
 from pyecharts.charts import Bar
+from pyecharts.charts import Gauge
 from github import Github
 from data_extraction import Scope
 from dotenv import load_dotenv
 import os
-from data_processing import get_repos
-from data_processing import get_code_review_time
+from data_processing import *
 
 load_dotenv()
 github = Github(os.environ.get("GH_API_TOKEN"))
@@ -55,6 +55,7 @@ def draw(repo):
     with use_scope("scope1", clear=True):
         put_button("back", onclick=page2)
         task3(repo)
+        task_typed(repo)
     
 
 def task3(repo):
@@ -75,6 +76,29 @@ def task3(repo):
     )
     c.width = "100%"
     put_html(c.render_notebook())
+
+def task_typed(repo):
+    global usr
+    typed_percent = get_typed_percentage(usr, repo)
+    c = (
+    Gauge()
+    .add(
+        "Typed Percent",
+        [("", typed_percent)],
+        axisline_opts=opts.AxisLineOpts(
+            linestyle_opts=opts.LineStyleOpts(
+                color=[(typed_percent/100, "#67e0e3"), (1, "#fd666d")], width=30
+            )
+        ),
+    )
+    .set_global_opts(
+        title_opts=opts.TitleOpts(title="Percentage of Typed Filed in Repo"),
+        legend_opts=opts.LegendOpts(is_show=False),
+    )
+    
+)
+    c.width = "100%"
+    put_html(c.render_notebook())    
     
     
     
