@@ -88,12 +88,12 @@ def task_typed(repo):
             [("", typed_percent)],
             axisline_opts=opts.AxisLineOpts(
                 linestyle_opts=opts.LineStyleOpts(
-                    color=[(typed_percent / 100, "#67e0e3"), (1, "#fd666d")], width=30
+                    color=[(typed_percent / 100, "#77dd77 "), (1, "#ef3038")], width=30
                 )
             ),
         )
         .set_global_opts(
-            title_opts=opts.TitleOpts(title="Percentage of Typed Filed in Repo"),
+            title_opts=opts.TitleOpts(title="Percentage of Typed Files in Repo"),
             legend_opts=opts.LegendOpts(is_show=False),
         )
     )
