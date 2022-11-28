@@ -6,6 +6,7 @@ class Content(Enum):
     REPO = auto()
     PR = auto()
     FILE = auto()
+    COMMIT = auto()
 
 
 class Language(Enum):
