@@ -42,6 +42,15 @@ def two_months_ago(today) -> Type[datetime]:
     return today - relativedelta(months=2)
 
 
+@pytest.fixture
+def nov_16_2022() -> Type[datetime]:
+    return datetime(year=2022, month=11, day=16)
+
+@pytest.fixture
+def two_months_to_nov_16_2022(nov_16_2022) -> Type[datetime]:
+    return nov_16_2022 - relativedelta(months=2)
+
+
 ########## TESTS ##########
 def test_repos(organization: Type[Scope], user1: Type[Scope]):
     assert compare_list_to_set(
@@ -157,6 +166,57 @@ def test_file_contents(organization: Type[Scope], user1: Type[Scope]):
     )
 
 
+def test_commits(
+    organization: Type[Scope],
+    user1: Type[Scope],
+    user2: Type[Scope],
+    nov_16_2022: Type[datetime],
+    two_months_to_nov_16_2022: Type[datetime],
+):
+    assert compare_list_to_set(
+        organization.get_all_commits_in_repo("fastapi"),
+        {
+            "4f3f0360539b63cd9146a4b1baa8699e61068566",
+            "623013fe7dd7b1387633dbf708e3f5f5228f5054",
+        },
+        Content.COMMIT,
+    )
+    assert compare_list_to_set(
+        user1.get_all_commits_in_repo("learn-rust"),
+        {
+            "c0d81df78bbfed46ebd8f762587d03492c7f3978",
+            "a7046cb82b1b4d9bb1d656786dbe5b2ef238fcbf",
+        },
+        Content.COMMIT,
+    )
+
+    commits = organization.get_commits_by_time(
+        "fastapi", two_months_to_nov_16_2022, nov_16_2022
+    )
+    assert len(commits) == 25
+    assert compare_list_to_set(
+        commits,
+        {
+            "4f3f0360539b63cd9146a4b1baa8699e61068566",
+            "623013fe7dd7b1387633dbf708e3f5f5228f5054",
+        },
+        Content.COMMIT,
+    )
+
+    commits = user2.get_commits_by_time(
+        "vscode-ruff", two_months_to_nov_16_2022, nov_16_2022
+    )
+    assert len(commits) == 29
+    assert compare_list_to_set(
+        commits,
+        {
+            "82134820d794e1f87d818fa5dc75fb9d41ad5436",
+            "25a1684cc60d193ffbaeb7e88d3b2d63f939fa91",
+        },
+        Content.COMMIT,
+    )
+
+
 ########## HELPER FUNCTIONS ##########
 def compare_list_to_set(api_result, expected_values, flag) -> bool:
     assert isinstance(flag, Content), TypeError("flag expects a Content Enum.")
@@ -165,7 +225,11 @@ def compare_list_to_set(api_result, expected_values, flag) -> bool:
         for val in map(
             lambda x: x.name
             if flag == Content.REPO
-            else (x.path if flag == Content.FILE else x.title),
+            else (
+                x.path
+                if flag == Content.FILE
+                else (x.sha if flag == Content.COMMIT else x.title)
+            ),
             api_result,
         )
     }

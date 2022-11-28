@@ -22,6 +22,7 @@ class Scope:
         self.prs = {}
         self.python_files = {}
         self.javascript_files = {}
+        self.commits = {}
 
     def get_repositories(self) -> list:
         """
@@ -128,8 +129,21 @@ class Scope:
         """
         return self.get_files_by_language(repo, Language.JS)
 
-    def get_commits(self, repo):
-        pass
+    def get_commits_by_time(self, repo, since, until):
+        """
+        Returns a list of the commits within the specified times [to the default branch] in the repo
+        """
+        repository = self.scope.get_repo(repo)
+        return list(repository.get_commits(since=since, until=until))
+
+    def get_all_commits_in_repo(self, repo):
+        """
+        Returns a list of all the commits [to the default branch] in a repo
+        """
+        if repo not in self.commits:
+            repository = self.scope.get_repo(repo)
+            self.commits[repo] = list(repository.get_commits())
+        return self.commits[repo]
 
     def populate_cache_with_file_content(self, repo, file_extensions, cache):
         cache[repo] = []
