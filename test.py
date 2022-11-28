@@ -32,7 +32,6 @@ def user2(github) -> Scope:
     return Scope(github.get_user("charliermarsh"))
 
 
-
 @pytest.fixture
 def nov_16_2022() -> datetime:
     return datetime(year=2022, month=11, day=16)
@@ -128,7 +127,9 @@ def test_prs(
         user2.get_prs_from_repo("ocaml-futures"), {"Fix copy"}, flag=Content.PR
     )
     assert compare_list_to_set(
-        user2.get_prs_by_time(repo="vscode-ruff", before=two_months_to_nov_16_2022, after=nov_16_2022),
+        user2.get_prs_by_time(
+            repo="vscode-ruff", before=two_months_to_nov_16_2022, after=nov_16_2022
+        ),
         {"Fix incorrect repository URL"},
         flag=Content.PR,
     )

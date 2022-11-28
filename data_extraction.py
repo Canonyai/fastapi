@@ -99,18 +99,14 @@ class Scope:
 
         return self.prs
 
-    def get_issues_by_time(
-        self, repo: str, before: datetime, after: datetime
-    ) -> list:
+    def get_issues_by_time(self, repo: str, before: datetime, after: datetime) -> list:
         """
         Returns a list of issues in the specified timeframe
         """
         issues = self.get_issues_from_repo(repo)
         return [val for val in issues if self.get_values_in_range(val, before, after)]
 
-    def get_prs_by_time(
-        self, repo: str, before: datetime, after: datetime
-    ) -> list:
+    def get_prs_by_time(self, repo: str, before: datetime, after: datetime) -> list:
         """
         Returns a list of prs in the specified timeframe
         """
