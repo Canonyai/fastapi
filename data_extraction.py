@@ -1,6 +1,6 @@
 from typing import Dict
 from collections import deque
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 from utils import Language
 
@@ -48,22 +48,34 @@ class Scope:
         self.commits = {}
         self.typed_files = {}
         self.untyped_files = {}
+        self.repos_last_updated = None
+        self.issues_last_updated = {}
+        self.prs_last_updated = {}
+        self.commits_last_updated = {}
+        self.typed_files_last_updated = {}
+        self.untyped_files_last_updated = {}
+        self.python_files_last_updated = {}
+        self.javascript_files_last_updated = {}
 
     def get_repositories(self) -> list:
         """
         returns a list of all public repositories including forked repos
         """
-        if not self.repos:
+        if not self.repos or self.is_cache_expired(self.repos_last_updated):
             self.repos = list(self.scope.get_repos())
+            self.repos_last_updated = datetime.now(timezone.utc)
         return self.repos
 
     def get_issues(self) -> Dict[str, list]:
         """
-        Returns a list of all the closed issues from all the repositories in the scope
+        Returns a dict with lists of all the closed issues from all the repositories in the scope as the values.
         """
         for repo in self.get_repositories():
-            if repo.name not in self.issues:
+            if repo.name not in self.issues or self.is_cache_expired(
+                self.issues_last_updated[repo.name]
+            ):
                 self.issues[repo.name] = list(repo.get_issues(state="closed"))
+                self.issues_last_updated[repo.name] = datetime.now(timezone.utc)
 
         return self.issues
 
@@ -71,31 +83,38 @@ class Scope:
         """
         Returns a list of all the closed issues from the specified repository.
         """
-        if repo not in self.issues:
+        if repo not in self.issues or self.is_cache_expired(
+            self.issues_last_updated[repo]
+        ):
             repository = self.scope.get_repo(repo)
             issues = list(repository.get_issues(state="closed"))
             self.issues[repo] = issues
+            self.issues_last_updated[repo] = datetime.now(timezone.utc)
 
         return self.issues[repo]
 
     def get_prs_from_repo(self, repo: str) -> list:
         """
-        Returns a list of all closed pull requests from the specified repository.
+        Returns a dict with lists of all closed pull requests from the specified repository as the values.
         """
-        if repo not in self.prs:
+        if repo not in self.prs or self.is_cache_expired(self.prs_last_updated[repo]):
             repository = self.scope.get_repo(repo)
             prs = list(repository.get_pulls(state="closed"))
             self.prs[repo] = prs
+            self.prs_last_updated[repo] = datetime.now(timezone.utc)
 
         return self.prs[repo]
 
     def get_pull_requests(self) -> list:
         """
-        Returns a list of all closed pull requests from all repositories in the scope.
+        Returns a dict of all closed pull requests from all repositories in the scope.
         """
         for repo in self.get_repositories():
-            if repo.name not in self.prs:
+            if repo.name not in self.prs or self.is_cache_expired(
+                self.prs_last_updated[repo.name]
+            ):
                 self.prs[repo.name] = list(repo.get_pulls(state="closed"))
+                self.prs_last_updated[repo.name] = datetime.now(timezone.utc)
 
         return self.prs
 
@@ -118,36 +137,48 @@ class Scope:
         Returns a list of files in a repo that match the specified language
         """
         if language == Language.PY:
-            if repo in self.python_files:
+            if repo in self.python_files and not self.is_cache_expired(
+                self.python_files_last_updated[repo]
+            ):
                 return self.python_files[repo]
             else:
                 self.python_files = self.populate_cache_with_file_content(
                     repo, self.PY_EXTENSIONS, self.python_files
                 )
+                self.python_files_last_updated[repo] = datetime.now(timezone.utc)
                 return self.python_files[repo]
         elif language == Language.JS:
-            if repo in self.javascript_files:
+            if repo in self.javascript_files and not self.is_cache_expired(
+                self.javascript_files_last_updated[repo]
+            ):
                 return self.javascript_files[repo]
             else:
                 self.javascript_files = self.populate_cache_with_file_content(
                     repo, self.JS_EXTENSIONS, self.javascript_files
                 )
+                self.javascript_files_last_updated[repo] = datetime.now(timezone.utc)
                 return self.javascript_files[repo]
         elif language == Language.TYPED:
-            if repo in self.typed_files:
+            if repo in self.typed_files and not self.is_cache_expired(
+                self.typed_files_last_updated[repo]
+            ):
                 return self.typed_files[repo]
             else:
                 self.typed_files = self.populate_cache_with_file_content(
                     repo, self.TYPED_EXTENSIONS, self.typed_files
                 )
+                self.typed_files_last_updated[repo] = datetime.now(timezone.utc)
                 return self.typed_files[repo]
         elif language == Language.UNTYPED:
-            if repo in self.untyped_files:
+            if repo in self.untyped_files and self.is_cache_expired(
+                self.untyped_files[repo]
+            ):
                 return self.untyped_files[repo]
             else:
                 self.untyped_files = self.populate_cache_with_file_content(
                     repo, self.UNTYPED_EXTENSIONS, self.untyped_files
                 )
+                self.untyped_files_last_updated[repo] = datetime.now(timezone.utc)
                 return self.untyped_files[repo]
         else:
             raise TypeError(
@@ -177,9 +208,12 @@ class Scope:
         """
         Returns a list of all the commits [to the default branch] in a repo
         """
-        if repo not in self.commits:
+        if repo not in self.commits or self.is_cache_expired(
+            self.commits_last_updated[repo]
+        ):
             repository = self.scope.get_repo(repo)
             self.commits[repo] = list(repository.get_commits())
+            self.commits_last_updated[repo] = datetime.now(timezone.utc)
         return self.commits[repo]
 
     def get_typed_files(self, repo) -> list:
@@ -215,3 +249,9 @@ class Scope:
         Takes in a closed issue or pr and returns how long it takes to close the repo
         """
         return object.closed_at - object.created_at
+
+    def is_cache_expired(self, time: datetime) -> bool:
+        assert time is not None
+        if time < (datetime.now(timezone.utc) - timedelta(days=1)):
+            return True
+        return False
