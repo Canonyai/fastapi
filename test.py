@@ -46,6 +46,7 @@ def two_months_ago(today) -> Type[datetime]:
 def nov_16_2022() -> Type[datetime]:
     return datetime(year=2022, month=11, day=16)
 
+
 @pytest.fixture
 def two_months_to_nov_16_2022(nov_16_2022) -> Type[datetime]:
     return nov_16_2022 - relativedelta(months=2)

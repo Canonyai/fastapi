@@ -1,5 +1,8 @@
 # Software Engineering Productivity Metrics
 
+## Guide for running
+open browser, go to http://haha.jefflee543.tk:5000/
+
 ## Guide for Contributing
 
 1. Clone the repo

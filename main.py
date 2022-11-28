@@ -1,5 +1,4 @@
-from pywebio.platform.flask import webio_view
-from flask import Flask
+import pywebio
 from pywebio.input import *
 from pyecharts import options as opts
 from pyecharts.charts import Radar
@@ -11,15 +10,16 @@ from pywebio.pin import *
 from pywebio.output import put_html
 from pyecharts import options as opts
 from pyecharts.charts import Bar
+from pyecharts.charts import Gauge
 from github import Github
 from data_extraction import Scope
 from dotenv import load_dotenv
 import os
-from data_processing import get_repos
-from data_processing import get_code_review_time
+from data_processing import *
 
 load_dotenv()
 github = Github(os.environ.get("GH_API_TOKEN"))
+
 
 def task1():
     global usr
@@ -33,22 +33,21 @@ def task1():
     headers = ["number", "name"]
     rows = tableSrc
     table.add(headers, rows)
-    table.set_global_opts(
-        title_opts=ComponentTitleOpts(title="Repos")
-    )
+    table.set_global_opts(title_opts=ComponentTitleOpts(title="Repos"))
     put_html(table.render_notebook())
+
 
 def page2():
     global name
     with use_scope("scope1", clear=True):
-        put_markdown('## Repos of '+name)
+        put_markdown("## Repos of " + name)
         task1()
         task2()
 
 
 def task2():
-    info = input_group("repo", [input('enter repo name:', name='name')])
-    repo_name = info['name']
+    info = input_group("repo", [input("enter repo name:", name="name")])
+    repo_name = info["name"]
     draw(repo_name)
 
 
@@ -56,29 +55,51 @@ def draw(repo):
     with use_scope("scope1", clear=True):
         put_button("back", onclick=page2)
         task3(repo)
-    
+        task_typed(repo)
+
 
 def task3(repo):
     global usr
     x_axis, y_axis = get_code_review_time(usr, repo)
     c = (
         Bar()
-        .add_xaxis(
-            x_axis
-        )
+        .add_xaxis(x_axis)
         .add_yaxis(repo, y_axis)
         .set_global_opts(
             xaxis_opts=opts.AxisOpts(axislabel_opts=opts.LabelOpts(rotate=-15)),
-            title_opts=opts.TitleOpts(title="Code review", subtitle="x_axis: pull request name, y_axis: closing time in mins"),
-            datazoom_opts=[opts.DataZoomOpts(), opts.DataZoomOpts(type_="inside")]
+            title_opts=opts.TitleOpts(
+                title="Code review",
+                subtitle="x_axis: pull request name, y_axis: closing time in mins",
+            ),
+            datazoom_opts=[opts.DataZoomOpts(), opts.DataZoomOpts(type_="inside")],
         )
-    
     )
     c.width = "100%"
     put_html(c.render_notebook())
-    
-    
-    
+
+
+def task_typed(repo):
+    global usr
+    typed_percent = get_typed_percentage(usr, repo)
+    c = (
+        Gauge()
+        .add(
+            "Typed Percent",
+            [("", typed_percent)],
+            axisline_opts=opts.AxisLineOpts(
+                linestyle_opts=opts.LineStyleOpts(
+                    color=[(typed_percent / 100, "#77dd77 "), (1, "#ef3038")], width=30
+                )
+            ),
+        )
+        .set_global_opts(
+            title_opts=opts.TitleOpts(title="Percentage of Typed Files in Repo"),
+            legend_opts=opts.LegendOpts(is_show=False),
+        )
+    )
+    c.width = "100%"
+    put_html(c.render_notebook())
+
 
 def main():
     global name
@@ -86,17 +107,6 @@ def main():
     name = input("Username")
     usr = Scope(github.get_user(name))
     page2()
-        
 
 
-
-app = Flask(__name__)
-
-# `task_func` is PyWebIO task function
-app.add_url_rule('/tool', 'webio_view', webio_view(main),
-                 methods=['GET', 'POST', 'OPTIONS'])  # need GET,POST and OPTIONS methods
-                 
- # TODO METRIC TEAM:  Add a new URL for YOUR specific metric 
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5002)
+pywebio.start_server(main, port=5000, remote_access=True)
