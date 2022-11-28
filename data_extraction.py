@@ -1,4 +1,4 @@
-from typing import Dict, Type
+from typing import Dict
 from collections import deque
 from datetime import datetime
 
@@ -100,7 +100,7 @@ class Scope:
         return self.prs
 
     def get_issues_by_time(
-        self, repo: str, before: Type[datetime], after: Type[datetime]
+        self, repo: str, before: datetime, after: datetime
     ) -> list:
         """
         Returns a list of issues in the specified timeframe
@@ -109,7 +109,7 @@ class Scope:
         return [val for val in issues if self.get_values_in_range(val, before, after)]
 
     def get_prs_by_time(
-        self, repo: str, before: Type[datetime], after: Type[datetime]
+        self, repo: str, before: datetime, after: datetime
     ) -> list:
         """
         Returns a list of prs in the specified timeframe
@@ -170,14 +170,14 @@ class Scope:
         """
         return self.get_files_by_language(repo, Language.JS)
 
-    def get_commits_by_time(self, repo, since, until):
+    def get_commits_by_time(self, repo, since, until) -> list:
         """
         Returns a list of the commits within the specified times [to the default branch] in the repo
         """
         repository = self.scope.get_repo(repo)
         return list(repository.get_commits(since=since, until=until))
 
-    def get_all_commits_in_repo(self, repo):
+    def get_all_commits_in_repo(self, repo) -> list:
         """
         Returns a list of all the commits [to the default branch] in a repo
         """

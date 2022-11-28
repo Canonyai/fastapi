@@ -1,7 +1,7 @@
+from __future__ import annotations
 from data_extraction import Scope
 from github import Github
 import pytest
-from typing import Type
 from utils import Content, Language
 import os
 from dotenv import load_dotenv
@@ -13,38 +13,38 @@ load_dotenv()
 
 
 @pytest.fixture
-def github() -> Type[Github]:
+def github() -> Github:
     return Github(os.environ.get("GH_API_TOKEN"))
 
 
 @pytest.fixture
-def organization(github) -> Type[Scope]:
+def organization(github) -> Scope:
     return Scope(github.get_organization("SwengProject3Team9"))
 
 
 @pytest.fixture
-def user1(github) -> Type[Scope]:
+def user1(github) -> Scope:
     return Scope(github.get_user("algo-1"))
 
 
 @pytest.fixture
-def user2(github) -> Type[Scope]:
+def user2(github) -> Scope:
     return Scope(github.get_user("charliermarsh"))
 
 
 
 @pytest.fixture
-def nov_16_2022() -> Type[datetime]:
+def nov_16_2022() -> datetime:
     return datetime(year=2022, month=11, day=16)
 
 
 @pytest.fixture
-def two_months_to_nov_16_2022(nov_16_2022) -> Type[datetime]:
+def two_months_to_nov_16_2022(nov_16_2022) -> datetime:
     return nov_16_2022 - relativedelta(months=2)
 
 
 ########## TESTS ##########
-def test_repos(organization: Type[Scope], user1: Type[Scope]):
+def test_repos(organization: Scope, user1: Scope):
     assert compare_list_to_set(
         organization.get_repositories(),
         {"sweng-metrics-front-end", "fastapi"},
@@ -71,10 +71,10 @@ def test_repos(organization: Type[Scope], user1: Type[Scope]):
 
 
 def test_issues(
-    organization: Type[Scope],
-    user2: Type[Scope],
-    nov_16_2022: Type[datetime],
-    two_months_to_nov_16_2022: Type[datetime],
+    organization: Scope,
+    user2: Scope,
+    nov_16_2022: datetime,
+    two_months_to_nov_16_2022: datetime,
 ):
     assert partial_compare(
         organization.get_issues(),
@@ -104,10 +104,10 @@ def test_issues(
 
 
 def test_prs(
-    organization: Type[Scope],
-    user2: Type[Scope],
-    nov_16_2022: Type[datetime],
-    two_months_to_nov_16_2022: Type[datetime],
+    organization: Scope,
+    user2: Scope,
+    nov_16_2022: datetime,
+    two_months_to_nov_16_2022: datetime,
 ):
     assert partial_compare(
         organization.get_pull_requests(),
@@ -134,7 +134,7 @@ def test_prs(
     )
 
 
-def test_file_contents(organization: Type[Scope], user1: Type[Scope]):
+def test_file_contents(organization: Scope, user1: Scope):
     assert compare_list_to_set(
         organization.get_files_by_language("fastapi", Language.PY),
         {"data_extraction.py", "test.py"},
@@ -159,11 +159,11 @@ def test_file_contents(organization: Type[Scope], user1: Type[Scope]):
 
 
 def test_commits(
-    organization: Type[Scope],
-    user1: Type[Scope],
-    user2: Type[Scope],
-    nov_16_2022: Type[datetime],
-    two_months_to_nov_16_2022: Type[datetime],
+    organization: Scope,
+    user1: Scope,
+    user2: Scope,
+    nov_16_2022: datetime,
+    two_months_to_nov_16_2022: datetime,
 ):
     assert compare_list_to_set(
         organization.get_all_commits_in_repo("fastapi"),
