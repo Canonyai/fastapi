@@ -32,15 +32,6 @@ def user2(github) -> Type[Scope]:
     return Scope(github.get_user("charliermarsh"))
 
 
-@pytest.fixture
-def today() -> Type[datetime]:
-    return datetime.today()
-
-
-@pytest.fixture
-def two_months_ago(today) -> Type[datetime]:
-    return today - relativedelta(months=2)
-
 
 @pytest.fixture
 def nov_16_2022() -> Type[datetime]:
@@ -82,8 +73,8 @@ def test_repos(organization: Type[Scope], user1: Type[Scope]):
 def test_issues(
     organization: Type[Scope],
     user2: Type[Scope],
-    today: Type[datetime],
-    two_months_ago: Type[datetime],
+    nov_16_2022: Type[datetime],
+    two_months_to_nov_16_2022: Type[datetime],
 ):
     assert partial_compare(
         organization.get_issues(),
@@ -105,7 +96,7 @@ def test_issues(
     )
     assert compare_list_to_set(
         user2.get_issues_by_time(
-            repo="vscode-ruff", before=two_months_ago, after=today
+            repo="vscode-ruff", before=two_months_to_nov_16_2022, after=nov_16_2022
         ),
         {"Error when trying to use ruff from selected virtual environment"},
         flag=Content.ISSUE,
@@ -115,8 +106,8 @@ def test_issues(
 def test_prs(
     organization: Type[Scope],
     user2: Type[Scope],
-    today: Type[datetime],
-    two_months_ago: Type[datetime],
+    nov_16_2022: Type[datetime],
+    two_months_to_nov_16_2022: Type[datetime],
 ):
     assert partial_compare(
         organization.get_pull_requests(),
@@ -137,7 +128,7 @@ def test_prs(
         user2.get_prs_from_repo("ocaml-futures"), {"Fix copy"}, flag=Content.PR
     )
     assert compare_list_to_set(
-        user2.get_prs_by_time(repo="vscode-ruff", before=two_months_ago, after=today),
+        user2.get_prs_by_time(repo="vscode-ruff", before=two_months_to_nov_16_2022, after=nov_16_2022),
         {"Fix incorrect repository URL"},
         flag=Content.PR,
     )
