@@ -31,7 +31,7 @@ def get_cycle_time(user: Scope, repo: str):
     after = datetime.today()  # parse_date(start_date)
     before = after - relativedelta(months=2)  # parse_date(end_date)
     prs = user.get_issues_by_time(repo, before, after)
-    # time_taken = [(isusses.title, user.get_time_taken(issues).minutes) for issues in seconds]
+    
 
     for issues in seconds:
         x_axis.append(issues.title)
