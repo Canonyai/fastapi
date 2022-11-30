@@ -24,6 +24,7 @@ def get_code_review_time(user: Scope, repo: str):
     return x_axis, y_axis
     
     
+
 # time taken for cycle time (issues start to completion) metric    
 def get_cycle_time(user: Scope, repo: str):
     x_axis = []
@@ -39,6 +40,7 @@ def get_cycle_time(user: Scope, repo: str):
 
     # print(*time_taken, sep="\n")
     return x_axis, y_axis
+
 
 
 # get repositories
