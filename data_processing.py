@@ -24,23 +24,21 @@ def get_code_review_time(user: Scope, repo: str):
     return x_axis, y_axis
     
     
-
 # time taken for cycle time (issues start to completion) metric    
 def get_cycle_time(user: Scope, repo: str):
     x_axis = []
     y_axis = []
     after = datetime.today()  # parse_date(start_date)
     before = after - relativedelta(months=2)  # parse_date(end_date)
-    prs = user.get_issues_by_time(repo, before, after)
+    issues = user.get_issues_by_time(repo, before, after)
     # time_taken = [(issue.title, user.get_time_taken(issue).minutes) for issue in issues]
 
-    for issue in issue:
-        x_axis.append(issue.title)
-        y_axis.append(round(user.get_time_taken(issue).seconds / 60, 3))
+    for issue in issues:
+        x_axis.append(issues.title)
+        y_axis.append(round(user.get_time_taken(issues).seconds / 60, 3))
 
     # print(*time_taken, sep="\n")
     return x_axis, y_axis
-
 
 
 # get repositories
