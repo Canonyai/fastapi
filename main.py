@@ -4,13 +4,14 @@ from pyecharts import options as opts
 from pyecharts.charts import Radar
 from pyecharts.components import Table
 from pyecharts.options import ComponentTitleOpts
-from pywebio import config
 from pywebio.output import *
 from pywebio.pin import *
 from pywebio.output import put_html
 from pyecharts import options as opts
 from pyecharts.charts import Bar
-from pyecharts.charts import Gauge
+from pyecharts.charts import Liquid
+from pyecharts.charts import PictorialBar
+from pyecharts.globals import SymbolType
 from github import Github
 from data_extraction import Scope
 from dotenv import load_dotenv
@@ -55,6 +56,7 @@ def draw(repo):
     with use_scope("scope1", clear=True):
         put_button("back", onclick=page2)
         task_typed(repo)
+        file_type(repo)
         code_review(repo)
         cycle_time(repo)
 
@@ -63,23 +65,63 @@ def task_typed(repo):
     global usr
     typed_percent = get_typed_percentage(usr, repo)
     c = (
-        Gauge()
+        Liquid()
         .add(
-            "Typed Percent",
-            [("", typed_percent)],
-            axisline_opts=opts.AxisLineOpts(
-                linestyle_opts=opts.LineStyleOpts(
-                    color=[(typed_percent / 100, "#77dd77 "), (1, "#ef3038")], width=30
-                )
+            "Typed files percentage",
+            [typed_percent/100],
+            label_opts=opts.LabelOpts(
+                font_size=50,
+                position="inside",
             ),
         )
-        .set_global_opts(
-            title_opts=opts.TitleOpts(title="Percentage of Typed Files in Repo"),
-            legend_opts=opts.LegendOpts(is_show=False),
-        )
+        .set_global_opts(title_opts=opts.TitleOpts(title="Typed files percentage"))
+    
     )
+
     c.width = "100%"
     put_html(c.render_notebook())
+
+
+def file_type(repo):
+    global usr
+    python_num = get_py_num(usr, repo)
+    java_num = get_java_num(usr, repo)
+    js_num = get_js_num(usr, repo)
+    c_num = get_C_num(usr, repo)
+    cpp_num = get_CPP_num(usr, repo)
+    location = ["C++", "C", "JS", "Java", "Python"]
+    values = [cpp_num, c_num, js_num, java_num, python_num]
+
+    c = (
+        PictorialBar()
+        .add_xaxis(location)
+        .add_yaxis(
+            "",
+            values,
+            label_opts=opts.LabelOpts(is_show=False),
+            symbol_size=18,
+            symbol_repeat="fixed",
+            symbol_offset=[0, 0],
+            is_symbol_clip=True,
+            symbol=SymbolType.ROUND_RECT,
+        )
+        .reversal_axis()
+        .set_global_opts(
+            title_opts=opts.TitleOpts(title="Language detail"),
+            xaxis_opts=opts.AxisOpts(is_show=False),
+            yaxis_opts=opts.AxisOpts(
+                axistick_opts=opts.AxisTickOpts(is_show=False),
+                axisline_opts=opts.AxisLineOpts(
+                    linestyle_opts=opts.LineStyleOpts(opacity=0)
+                ),
+            ),
+        )
+
+    )
+
+    c.width = "100%"
+    put_html(c.render_notebook())
+
 
 
 def code_review(repo):

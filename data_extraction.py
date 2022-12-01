@@ -13,7 +13,10 @@ class Scope:
     """
 
     JS_EXTENSIONS = (".js", ".jsx", ".ts", ".tsx")
-    PY_EXTENSIONS = (".py",)
+    PY_EXTENSIONS = (".py")
+    JAVA_EXTENSIONS = (".java")
+    C_EXTENSIONS = (".c")
+    CPP_EXTENSIONS = (".cpp", ".c++")
     TYPED_EXTENSIONS = (
         ".java",
         ".ts",
@@ -45,6 +48,9 @@ class Scope:
         self.prs = {}
         self.python_files = {}
         self.javascript_files = {}
+        self.java_files = {}
+        self.c_files = {}
+        self.cpp_files = {}
         self.commits = {}
         self.typed_files = {}
         self.untyped_files = {}
@@ -56,6 +62,9 @@ class Scope:
         self.untyped_files_last_updated = {}
         self.python_files_last_updated = {}
         self.javascript_files_last_updated = {}
+        self.java_files_last_updated = {}
+        self.c_files_last_updated = {}
+        self.cpp_files_last_updated = {}
 
     def get_repositories(self) -> list:
         """
@@ -180,6 +189,39 @@ class Scope:
                 )
                 self.untyped_files_last_updated[repo] = datetime.now(timezone.utc)
                 return self.untyped_files[repo]
+        elif language == Language.JAVA:
+            if repo in self.java_files and self.is_cache_expired(
+                self.java_files[repo]
+            ):
+                return self.java_files[repo]
+            else:
+                self.java_files = self.populate_cache_with_file_content(
+                    repo, self.JAVA_EXTENSIONS, self.java_files
+                )
+                self.java_files_last_updated[repo] = datetime.now(timezone.utc)
+                return self.java_files[repo]
+        elif language == Language.C:
+            if repo in self.c_files and self.is_cache_expired(
+                self.c_files[repo]
+            ):
+                return self.c_files[repo]
+            else:
+                self.c_files = self.populate_cache_with_file_content(
+                    repo, self.C_EXTENSIONS, self.c_files
+                )
+                self.c_files_last_updated[repo] = datetime.now(timezone.utc)
+                return self.c_files[repo]
+        elif language == Language.CPP:
+            if repo in self.cpp_files and self.is_cache_expired(
+                self.cpp_files[repo]
+            ):
+                return self.cpp_files[repo]
+            else:
+                self.cpp_files = self.populate_cache_with_file_content(
+                    repo, self.CPP_EXTENSIONS, self.cpp_files
+                )
+                self.cpp_files_last_updated[repo] = datetime.now(timezone.utc)
+                return self.cpp_files[repo]
         else:
             raise TypeError(
                 "A Language Enum should be passed in for the language parameter."
@@ -196,6 +238,24 @@ class Scope:
         Reeturns a list of javascript files in the repo
         """
         return self.get_files_by_language(repo, Language.JS)
+
+    def get_java_files(self, repo) -> list:
+        """
+        Returns a list of java files in the repo
+        """
+        return self.get_files_by_language(repo, Language.JAVA)
+
+    def get_C_files(self, repo) -> list:
+        """
+        Returns a list of C files in the repo
+        """
+        return self.get_files_by_language(repo, Language.C)
+    
+    def get_CPP_files(self, repo) -> list:
+        """
+        Returns a list of C files in the repo
+        """
+        return self.get_files_by_language(repo, Language.CPP)
 
     def get_commits_by_time(self, repo, since, until) -> list:
         """

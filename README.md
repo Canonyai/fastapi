@@ -3,7 +3,6 @@
 ## Guide for running
 
 open browser, go to [http://haha.jefflee543.tk:5000/](http://haha.jefflee543.tk:5000/)
-don't use TCD wifi
 
 ## Guide for Contributing
 

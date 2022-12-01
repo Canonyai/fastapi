@@ -12,5 +12,8 @@ class Content(Enum):
 class Language(Enum):
     PY = auto()
     JS = auto()
+    JAVA = auto()
+    C = auto()
+    CPP = auto()
     TYPED = auto()
     UNTYPED = auto()

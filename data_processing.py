@@ -57,6 +57,25 @@ def get_typed_percentage(user: Scope, repo: str):
     percentage = (len(files_typed) / (len(files_typed) + len(files_untyped))) * 100
     return round(percentage, 2)
 
+def get_py_num(user: Scope, repo: str):
+    py_file = user.get_python_files(repo)
+    return len(py_file)
+
+def get_js_num(user: Scope, repo: str):
+    js_file = user.get_javascript_files(repo)
+    return len(js_file)
+
+def get_java_num(user: Scope, repo: str):
+    java_file = user.get_java_files(repo)
+    return len(java_file)
+
+def get_C_num(user: Scope, repo: str):
+    C_file = user.get_C_files(repo)
+    return len(C_file)
+
+def get_CPP_num(user: Scope, repo: str):
+    CPP_file = user.get_CPP_files(repo)
+    return len(CPP_file)
 
 # get pull request turnaround time
 def get_pr_turnaround_time(user: Scope, start_date: str, end_date: str, repo: str):
@@ -94,4 +113,4 @@ if __name__ == "__main__":
     load_dotenv()
     github = Github(os.environ.get("GH_API_TOKEN"))
     usr = Scope(github.get_user("charliermarsh"))
-    print(get_cycle_time(usr, "ruff"))
+    print(get_java_num(usr, "vscode-ruff"))
