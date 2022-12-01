@@ -34,8 +34,8 @@ def get_cycle_time(user: Scope, repo: str):
     # time_taken = [(issue.title, user.get_time_taken(issue).minutes) for issue in issues]
 
     for issue in issues:
-        x_axis.append(issues.title)
-        y_axis.append(round(user.get_time_taken(issues).seconds / 60, 3))
+        x_axis.append(issue.title)
+        y_axis.append(round(user.get_time_taken(issue).seconds / 60, 3))
 
     # print(*time_taken, sep="\n")
     return x_axis, y_axis
@@ -94,4 +94,4 @@ if __name__ == "__main__":
     load_dotenv()
     github = Github(os.environ.get("GH_API_TOKEN"))
     usr = Scope(github.get_user("charliermarsh"))
-    print(get_code_review_time(usr, "ruff"))
+    print(get_cycle_time(usr, "ruff"))

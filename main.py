@@ -54,28 +54,9 @@ def task2():
 def draw(repo):
     with use_scope("scope1", clear=True):
         put_button("back", onclick=page2)
-        task3(repo)
         task_typed(repo)
-
-
-def task3(repo):
-    global usr
-    x_axis, y_axis = get_code_review_time(usr, repo)
-    c = (
-        Bar()
-        .add_xaxis(x_axis)
-        .add_yaxis(repo, y_axis)
-        .set_global_opts(
-            xaxis_opts=opts.AxisOpts(axislabel_opts=opts.LabelOpts(rotate=-15)),
-            title_opts=opts.TitleOpts(
-                title="Code review",
-                subtitle="x_axis: pull request name, y_axis: closing time in mins",
-            ),
-            datazoom_opts=[opts.DataZoomOpts(), opts.DataZoomOpts(type_="inside")],
-        )
-    )
-    c.width = "100%"
-    put_html(c.render_notebook())
+        code_review(repo)
+        cycle_time(repo)
 
 
 def task_typed(repo):
@@ -99,6 +80,66 @@ def task_typed(repo):
     )
     c.width = "100%"
     put_html(c.render_notebook())
+
+
+def code_review(repo):
+    global usr
+    x_axis, y_axis = get_code_review_time(usr, repo)
+    c = (
+        Bar()
+        .add_xaxis(x_axis)
+        .add_yaxis(repo, y_axis)
+        .set_global_opts(
+            xaxis_opts=opts.AxisOpts(axislabel_opts=opts.LabelOpts(rotate=-15)),
+            title_opts=opts.TitleOpts(
+                title="Code review",
+                subtitle="x_axis: Pull request name, y_axis: Closing time in mins",
+            ),
+            datazoom_opts=[opts.DataZoomOpts(), opts.DataZoomOpts(type_="inside")],
+        )
+        .set_series_opts(
+            label_opts=opts.LabelOpts(is_show=False),
+            markline_opts=opts.MarkLineOpts(
+                data=[
+                    opts.MarkLineItem(type_="average", name="average")
+                ]
+            ),
+        )
+    )
+    
+    c.width = "100%"
+    put_html(c.render_notebook())
+
+
+def cycle_time(repo):
+    global usr
+    x_axis, y_axis = get_cycle_time(usr, repo)
+    c = (
+        Bar()
+        .add_xaxis(x_axis)
+        .add_yaxis(repo, y_axis)
+        .set_global_opts(
+            xaxis_opts=opts.AxisOpts(axislabel_opts=opts.LabelOpts(rotate=-15)),
+            title_opts=opts.TitleOpts(
+                title="Issue cycle time",
+                subtitle="x_axis: Issue name, y_axis: Closing time in mins",
+            ),
+            datazoom_opts=[opts.DataZoomOpts(), opts.DataZoomOpts(type_="inside")],
+        )
+        .set_series_opts(
+            label_opts=opts.LabelOpts(is_show=False),
+            markline_opts=opts.MarkLineOpts(
+                data=[
+                    opts.MarkLineItem(type_="average", name="average")
+                ]
+            ),
+        )
+    )
+    
+    c.width = "100%"
+    put_html(c.render_notebook())
+
+
 
 
 def main():
