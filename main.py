@@ -37,7 +37,7 @@ def repo_list():
     table.set_global_opts(title_opts=ComponentTitleOpts(title="Repos"))
     put_html(table.render_notebook())
 
-
+# draw the second page which inclues the user's repos and a type box for the user to get info about a repo
 def page2():
     global name
     with use_scope("scope1", clear=True):
@@ -47,7 +47,7 @@ def page2():
         repo_name = info["name"]
         draw(repo_name)
 
-
+# displays the detailed info about the repo : typed file%, language detail, commits, code review, cycle time analysis
 def draw(repo):
     with use_scope("scope1", clear=True):
         put_button("back", onclick=page2)
@@ -61,6 +61,7 @@ def draw(repo):
             file_type(repo)
 
 
+# draw a liquid ball with percentage of typed files in the repo
 def task_typed(repo):
     global usr
     typed_percent = get_typed_percentage(usr, repo)
@@ -82,6 +83,7 @@ def task_typed(repo):
     put_html(c.render_notebook())
 
 
+# analysis language used in the repo 
 def file_type(repo):
     global usr
     python_num = get_py_num(usr, repo)
@@ -123,6 +125,7 @@ def file_type(repo):
     put_html(c.render_notebook())
 
 
+# analysis the commits in last 1, 3, 6, 12 months
 def commit_count(repo):
     global usr
     x_axis, y_axis = get_commits(usr, repo)
@@ -146,6 +149,7 @@ def commit_count(repo):
     put_html(c.render_notebook())
 
 
+# draw a bar chart on the time span of code_review in last 2 months
 def code_review(repo):
     global usr
     x_axis, y_axis = get_code_review_time(usr, repo)
@@ -156,7 +160,7 @@ def code_review(repo):
         .set_global_opts(
             xaxis_opts=opts.AxisOpts(axislabel_opts=opts.LabelOpts(rotate=-15)),
             title_opts=opts.TitleOpts(
-                title="Code review",
+                title="Code review in last 2 months",
                 subtitle="x_axis: Pull request name, y_axis: Closing time in mins",
             ),
             datazoom_opts=[opts.DataZoomOpts(), opts.DataZoomOpts(type_="inside")],
@@ -175,6 +179,7 @@ def code_review(repo):
     put_html(c.render_notebook())
 
 
+# draw a bar chart on the cycle_time in last 2 months
 def cycle_time(repo):
     global usr
     x_axis, y_axis = get_cycle_time(usr, repo)
@@ -185,7 +190,7 @@ def cycle_time(repo):
         .set_global_opts(
             xaxis_opts=opts.AxisOpts(axislabel_opts=opts.LabelOpts(rotate=-15)),
             title_opts=opts.TitleOpts(
-                title="Issue cycle time",
+                title="Issue cycle time in last 2 months",
                 subtitle="x_axis: Issue name, y_axis: Closing time in mins",
             ),
             datazoom_opts=[opts.DataZoomOpts(), opts.DataZoomOpts(type_="inside")],
@@ -204,10 +209,11 @@ def cycle_time(repo):
     put_html(c.render_notebook())
 
 
+# The main page, ask the user to enter the github's user name and display the next page
 def main():
     global name
     global usr
-    name = input("Username")
+    name = input("Git User/Organization Name")
     usr = Scope(github.get_user(name))
     page2()
 
