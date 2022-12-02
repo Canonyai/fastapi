@@ -1,8 +1,12 @@
 # Software Engineering Productivity Metrics
+## Demo video
+
+https://www.youtube.com/watch?v=oh_cCWUdtNQ
 
 ## Guide for running
 
 open browser, go to [http://haha.jefflee543.tk:5000/](http://haha.jefflee543.tk:5000/)
+ps. don't use TCD wifi
 
 ## Guide for Contributing
 
