@@ -68,7 +68,7 @@ def task_typed(repo):
     c = (
         Liquid()
         .add(
-            "Typed files percentage",
+            "Typed language percentage",
             [typed_percent/100],
             label_opts=opts.LabelOpts(
                 font_size=50,
