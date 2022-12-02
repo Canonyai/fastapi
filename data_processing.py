@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from dateutil.relativedelta import relativedelta
 from data_extraction import Scope
 from github import Github
@@ -22,9 +22,9 @@ def get_code_review_time(user: Scope, repo: str):
 
     # print(*time_taken, sep="\n")
     return x_axis, y_axis
-    
-    
-# time taken for cycle time (issues start to completion) metric    
+
+
+# time taken for cycle time (issues start to completion) metric
 def get_cycle_time(user: Scope, repo: str):
     x_axis = []
     y_axis = []
@@ -57,29 +57,30 @@ def get_typed_percentage(user: Scope, repo: str):
     percentage = (len(files_typed) / (len(files_typed) + len(files_untyped))) * 100
     return round(percentage, 2)
 
+
 def get_py_num(user: Scope, repo: str):
     py_file = user.get_python_files(repo)
     return len(py_file)
+
 
 def get_js_num(user: Scope, repo: str):
     js_file = user.get_javascript_files(repo)
     return len(js_file)
 
+
 def get_java_num(user: Scope, repo: str):
     java_file = user.get_java_files(repo)
     return len(java_file)
+
 
 def get_C_num(user: Scope, repo: str):
     C_file = user.get_C_files(repo)
     return len(C_file)
 
+
 def get_CPP_num(user: Scope, repo: str):
     CPP_file = user.get_CPP_files(repo)
     return len(CPP_file)
-
-# get pull request turnaround time
-def get_pr_turnaround_time(user: Scope, start_date: str, end_date: str, repo: str):
-    pass
 
 
 # get percentage of python in files
@@ -94,19 +95,20 @@ def calculate_percent_typed_js(files: str):
     pass
 
 
-# get number of lines of code in repo
-def get_lines_count(user: Scope, repo: str):
-    pass
-
-
 # get number of commits to project
 def get_commits(user: Scope, repo: str):
-    pass
+    until = datetime.now(timezone.utc)
+    x_axis = [1, 3, 12]  # months
+    y_axis = [
+        len(
+            user.get_commits_by_time(
+                repo, since=until - relativedelta(months=x_axis[i]), until=until
+            )
+        )
+        for i in range(len(x_axis))
+    ]
 
-
-# get code coverage stats from test files
-def get_code_coverage(user: Scope, repo: str, file: str):
-    pass
+    return x_axis, y_axis
 
 
 if __name__ == "__main__":
