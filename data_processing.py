@@ -98,7 +98,7 @@ def calculate_percent_typed_js(files: str):
 # get number of commits to project
 def get_commits(user: Scope, repo: str):
     until = datetime.now(timezone.utc)
-    x_axis = [1, 3, 12]  # months
+    x_axis = [1, 3, 6, 12]  # months
     y_axis = [
         len(
             user.get_commits_by_time(
@@ -114,5 +114,5 @@ def get_commits(user: Scope, repo: str):
 if __name__ == "__main__":
     load_dotenv()
     github = Github(os.environ.get("GH_API_TOKEN"))
-    usr = Scope(github.get_user("charliermarsh"))
-    print(get_java_num(usr, "vscode-ruff"))
+    usr = Scope(github.get_user("algo-1"))
+    print(get_commits(usr, "VancouverBusManagementSystem"))

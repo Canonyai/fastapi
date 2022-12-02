@@ -22,7 +22,7 @@ load_dotenv()
 github = Github(os.environ.get("GH_API_TOKEN"))
 
 
-def task1():
+def repo_list():
     global usr
     repo_list = get_repos(usr)
     tableSrc = []
@@ -42,23 +42,23 @@ def page2():
     global name
     with use_scope("scope1", clear=True):
         put_markdown("## Repos of " + name)
-        task1()
-        task2()
-
-
-def task2():
-    info = input_group("repo", [input("enter repo name:", name="name")])
-    repo_name = info["name"]
-    draw(repo_name)
+        repo_list()
+        info = input_group("repo", [input("enter repo name:", name="name")])
+        repo_name = info["name"]
+        draw(repo_name)
 
 
 def draw(repo):
     with use_scope("scope1", clear=True):
         put_button("back", onclick=page2)
-        task_typed(repo)
-        file_type(repo)
+        put_row([put_scope("c1"), None, put_scope("c2")], size='40% 10px 100%')
+        commit_count(repo)
         code_review(repo)
         cycle_time(repo)
+        with use_scope("c1"):
+            task_typed(repo)
+        with use_scope("c2"):
+            file_type(repo)
 
 
 def task_typed(repo):
@@ -123,6 +123,28 @@ def file_type(repo):
     put_html(c.render_notebook())
 
 
+def commit_count(repo):
+    global usr
+    x_axis, y_axis = get_commits(usr, repo)
+    c = (
+        Bar()
+        .add_xaxis(x_axis)
+        .add_yaxis(repo, y_axis)
+        .set_global_opts(
+            xaxis_opts=opts.AxisOpts(axislabel_opts=opts.LabelOpts(rotate=-15)),
+            title_opts=opts.TitleOpts(
+                title="commit count",
+                subtitle="x_axis: time range in month, y_axis: Commits",
+            )
+        )
+        .set_series_opts(
+            label_opts=opts.LabelOpts(is_show=False)
+        )
+    )
+    
+    c.width = "100%"
+    put_html(c.render_notebook())
+
 
 def code_review(repo):
     global usr
@@ -180,8 +202,6 @@ def cycle_time(repo):
     
     c.width = "100%"
     put_html(c.render_notebook())
-
-
 
 
 def main():
